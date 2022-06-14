@@ -116,6 +116,7 @@ public class Game {
             int randomInt = random.nextInt(Items.values.length);
             shout(Items.values[randomInt].getName());
             ItemArmorStand itemArmorStand = new ItemArmorStand(loc,Items.values[randomInt]);
+            itemArmorStand.runTaskTimer(plugin,0,1);
             itemLList.add(itemArmorStand);
         }
     }

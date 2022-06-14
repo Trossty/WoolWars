@@ -31,6 +31,7 @@ public class ItemArmorStand extends BukkitRunnable {
 
     @Override
     public void run() {
+        if(this.armorStand.isDead()) cancel();
         double rotationY = Math.toDegrees(this.armorStand.getHeadPose().getY());
         this.armorStand.setHeadPose(new EulerAngle(Math.toRadians(0),Math.toRadians(rotationY+1),Math.toRadians(0)));
     }
