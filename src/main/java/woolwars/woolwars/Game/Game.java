@@ -109,14 +109,13 @@ public class Game {
     //bow
 
     public void spawnItem(){
-        Items.listAll();
         Random random = new Random();
 
         for (String locationName: plugin.getLocations().getConfiguration().getConfigurationSection("ItemSpawn").getKeys(false)){
             Location loc = plugin.getLocations().getConfiguration().getLocation("ItemSpawn."+locationName);
-            int randomInt = random.nextInt(Items.values().length+1);
-            shout(Items.getMap().get(randomInt).getName());
-            ItemArmorStand itemArmorStand = new ItemArmorStand(loc,Items.getMap().get(randomInt));
+            int randomInt = random.nextInt(Items.values.length);
+            shout(Items.values[randomInt].getName());
+            ItemArmorStand itemArmorStand = new ItemArmorStand(loc,Items.values[randomInt]);
             itemLList.add(itemArmorStand);
         }
     }
