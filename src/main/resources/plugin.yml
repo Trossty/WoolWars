@@ -1,0 +1,10 @@
+name: WoolWars
+version: '${project.version}'
+main: woolwars.woolwars.WoolWarsPlugin
+api-version: 1.18
+authors: [ Trossty ]
+description: WoolWars From Hypixel
+website: https://github.com/Trossty
+commands:
+  woolwars:
+    aliases: [ww]
