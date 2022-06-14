@@ -25,6 +25,8 @@ public class ItemArmorStand extends BukkitRunnable {
         armorStand.setGravity(false);
         armorStand.setHelmet(new ItemStack(type.getHeadMaterial()));
         armorStand.setCustomName(Colorize.format(type.getName()));
+        armorStand.addScoreboardTag("type");
+        armorStand.addScoreboardTag(type.name());
     }
 
     @Override

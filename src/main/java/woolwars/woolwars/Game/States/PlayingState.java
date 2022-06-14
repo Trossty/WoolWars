@@ -3,6 +3,7 @@ package woolwars.woolwars.Game.States;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -22,6 +23,7 @@ import woolwars.woolwars.Utils.Colorize;
 import woolwars.woolwars.WoolWarsPlugin;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class PlayingState extends GameState {
 
@@ -116,24 +118,25 @@ public class PlayingState extends GameState {
 
         Player player = event.getPlayer();
 
-        itemsLocations.forEach((location ,type) -> {
-            if(getDistance(event.getTo().getX(),location.getBlockX()) < 1.5 && getDistance(event.getTo().getZ(),location.getBlockZ()) < 1.5){
+        for(Entity entity: player.getNearbyEntities(1.5,200,1.5)){
+            LinkedList<String> linkedList = new LinkedList<>(entity.getScoreboardTags());
+            if(!linkedList.contains("type")) continue;
+            linkedList.remove("type");
+            Items type = Items.valueOf(linkedList.get(0));
 
-                switch (type){
-                    case bow : player.getInventory().addItem(new ItemStack(Material.BOW)); player.getInventory().addItem(new ItemStack(Material.ARROW,2)); break;
-                    case sword: player.getInventory().addItem(new ItemStack(Material.STONE_SWORD)); break;
-                    case pickaxe: player.getInventory().addItem(new ItemStack(Material.STONE_PICKAXE)); break;
-                    case heal: if(player.getHealth()<20){player.setHealth(20);} break;
-                    case jump: player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,100,2)); break;
-                    case speed:player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,100,2)); break;
-                    case strength: player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,40,1)); break;
-                }
-
-                itemsLocationswith.get(location).delArmorstand();
-                itemsLocations.remove(location);
+            switch (type){
+                case bow : player.getInventory().addItem(new ItemStack(Material.BOW)); player.getInventory().addItem(new ItemStack(Material.ARROW,2)); break;
+                case sword: player.getInventory().addItem(new ItemStack(Material.STONE_SWORD)); break;
+                case pickaxe: player.getInventory().addItem(new ItemStack(Material.STONE_PICKAXE)); break;
+                case heal: if(player.getHealth()<20){player.setHealth(20);} break;
+                case jump: player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,100,2)); break;
+                case speed:player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,100,2)); break;
+                case strength: player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,40,1)); break;
             }
-        });
 
+            entity.remove();
+
+        }
 
 
     }
