@@ -2,16 +2,16 @@ package woolwars.woolwars;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import woolwars.woolwars.Api.assemble.Assemble;
-import woolwars.woolwars.Api.assemble.AssembleStyle;
-import woolwars.woolwars.Commands.MainCommand;
-import woolwars.woolwars.Game.Game;
-import woolwars.woolwars.Game.States.LobbyState;
-import woolwars.woolwars.Managers.GameManager;
-import woolwars.woolwars.Managers.LocationManager;
+import woolwars.woolwars.api.assemble.Assemble;
+import woolwars.woolwars.api.assemble.AssembleStyle;
+import woolwars.woolwars.commands.MainCommand;
+import woolwars.woolwars.game.Game;
+import woolwars.woolwars.game.states.LobbyState;
+import woolwars.woolwars.managers.GameManager;
+import woolwars.woolwars.managers.LocationManager;
 import woolwars.woolwars.Objects.Scoreboard.Scoreboard;
-import woolwars.woolwars.Utils.Colorize;
-import woolwars.woolwars.Utils.ConfigurationFile;
+import woolwars.woolwars.utils.Colorize;
+import woolwars.woolwars.utils.ConfigurationFile;
 
 public final class WoolWarsPlugin extends JavaPlugin {
 

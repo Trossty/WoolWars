@@ -1,10 +1,9 @@
 package woolwars.woolwars.Objects.Scoreboard;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import woolwars.woolwars.Api.assemble.AssembleAdapter;
-import woolwars.woolwars.Game.GamePlayer;
-import woolwars.woolwars.Utils.Colorize;
+import woolwars.woolwars.api.assemble.AssembleAdapter;
+import woolwars.woolwars.game.GamePlayer;
+import woolwars.woolwars.utils.Colorize;
 import woolwars.woolwars.WoolWarsPlugin;
 
 import java.util.ArrayList;
