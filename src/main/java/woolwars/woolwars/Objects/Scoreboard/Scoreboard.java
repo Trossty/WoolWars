@@ -71,6 +71,19 @@ public class Scoreboard implements AssembleAdapter {
             lines.add(Colorize.format(gamePlayer.getTeam().getTeamType().getColoredName()));
             lines.add("");
             return lines;
+        }else if(getPlugin().getGameManager().getGame().getGameState().getName().equalsIgnoreCase("playing")){
+            lines.clear();
+            lines.add("");
+            lines.add(Colorize.format("&6Players:"));
+            lines.add(Colorize.format(" &7"+ allPlayers));
+            lines.add("");
+            lines.add(Colorize.format("&6Time:"));
+            lines.add(Colorize.format(" &7"+min+":"+sec));
+            lines.add("");
+            lines.add(Colorize.format("&6Score:"));
+            lines.add(Colorize.format("&9"+plugin.getGameManager().getGame().getBlueTeam().getScore()+"&7/&4"+plugin.getGameManager().getGame().getRedTeam().getScore()));
+            lines.add("");
+            return lines;
         }
 
         return null;

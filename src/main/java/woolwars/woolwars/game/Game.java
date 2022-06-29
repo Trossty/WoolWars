@@ -2,6 +2,8 @@ package woolwars.woolwars.game;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import woolwars.woolwars.enums.Items;
 import woolwars.woolwars.enums.Locations;
 import woolwars.woolwars.enums.TeamType;
@@ -24,6 +26,7 @@ public class Game {
 
     private int time = 0;
 
+    private ArmorStand armorStand;
     public Game(WoolWarsPlugin plugin){
 
         this.plugin = plugin;
@@ -112,12 +115,15 @@ public class Game {
         Random random = new Random();
 
         for (String locationName: plugin.getLocations().getConfiguration().getConfigurationSection("ItemSpawn").getKeys(false)){
-            Location loc = plugin.getLocations().getConfiguration().getLocation("ItemSpawn."+locationName);
+            Location aLoc = plugin.getLocations().getConfiguration().getLocation("ItemSpawn."+locationName);
+            Location loc = new Location(aLoc.getWorld(),aLoc.getBlockX(),aLoc.getBlockY(),aLoc.getBlockZ());
+
             int randomInt = random.nextInt(Items.values.length);
             shout(Items.values[randomInt].getName());
             ItemArmorStand itemArmorStand = new ItemArmorStand(loc,Items.values[randomInt]);
             itemArmorStand.runTaskTimer(plugin,0,1);
             itemLList.add(itemArmorStand);
+
         }
     }
 
