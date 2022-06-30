@@ -1,6 +1,8 @@
 package woolwars.woolwars.game.states;
 
 import org.bukkit.GameMode;
+import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -25,6 +27,12 @@ public class LobbyState extends GameState {
     @Override
     public void onEnable(){
         super.onEnable();
+
+        World world = getPlugin().getLocationManager().getLocations(Locations.blueSpawn).getWorld();
+
+        for(ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)){
+            armorStand.remove();
+        }
     }
 
     @Override

@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -18,6 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import woolwars.woolwars.enums.Items;
 import woolwars.woolwars.enums.Locations;
 import woolwars.woolwars.enums.TeamType;
@@ -30,24 +30,95 @@ import woolwars.woolwars.WoolWarsPlugin;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Random;
 
 public class PlayingState extends GameState {
 
     private HashMap<Location, Items> itemsLocations = new HashMap<>();
     private HashMap<Location, ItemArmorStand> itemsLocationswith = new HashMap<>();
 
+    private BukkitRunnable bukkitRunnable;
+
+    private int rPlayer = 0;
+
+    private int bPlayer= 0;
+
     public PlayingState(WoolWarsPlugin plugin) {
         super(plugin, "playing");
+    }
+
+    @Override
+    public void onEnable(){
+        super.onEnable();
 
         itemsLocations.clear();
         itemsLocationswith.clear();
 
         getGame().getItemLList().forEach(itemArmorStand ->{
-                itemsLocations.put(itemArmorStand.getLocation(),itemArmorStand.getType());
-                itemsLocationswith.put(itemArmorStand.getLocation(),itemArmorStand);
+            itemsLocations.put(itemArmorStand.getLocation(),itemArmorStand.getType());
+            itemsLocationswith.put(itemArmorStand.getLocation(),itemArmorStand);
         });
 
+        getGame().getPlayerList().stream().map(Bukkit::getPlayer).forEach(player -> {
+            GamePlayer gamePlayer = GamePlayer.getGamePlayer(player).get();
+            switch (gamePlayer.getTeam().getTeamType()){
+                case RED -> rPlayer++;
+                case BLUE -> bPlayer++;
+            }
+        });
+
+        getGame().getRedTeam().setRemaningPlayerCount(rPlayer);
+        getGame().getBlueTeam().setRemaningPlayerCount(bPlayer);
+
+        getGame().setTime(60);
+
+        bukkitRunnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+
+                if(getGame().getTime()==0){
+
+
+                    getGame().getPlayerList().stream().map(Bukkit::getPlayer).forEach(player -> {
+                        GamePlayer gamePlayer = GamePlayer.getGamePlayer(player).get();
+                        switch (gamePlayer.getTeam().getTeamType()){
+                            case RED -> rPlayer++;
+                            case BLUE -> bPlayer++;
+                        }
+                    });
+
+                    getGame().getRedTeam().setRemaningPlayerCount(rPlayer);
+                    getGame().getBlueTeam().setRemaningPlayerCount(bPlayer);
+
+                    if(rPlayer==0){
+                        if(getGame().getBlueTeam().getScore()==3){
+                            getGame().setGameState(new EndState(getPlugin()));
+                            return;
+                        }
+                        getGame().getBlueTeam().setScore(getGame().getBlueTeam().getScore()+1);
+                        restart(getGame().getBlueTeam());
+                    }else if(bPlayer==0){
+                        if(getGame().getRedTeam().getScore()==3){
+                            getGame().setGameState(new EndState(getPlugin()));
+                            return;
+                        }
+                        getGame().getRedTeam().setScore(getGame().getRedTeam().getScore()+1);
+                        restart(getGame().getRedTeam());
+                    }
+
+                    cancel();
+                }
+
+                getGame().setTime(getGame().getTime()-1);
+            }
+        };
+
+        bukkitRunnable.runTaskTimer(getPlugin(),0,20);
+    }
+
+    @Override
+    public void onDisable(){
+        super.onDisable();
+        bukkitRunnable.cancel();
     }
 
 
@@ -122,11 +193,19 @@ public class PlayingState extends GameState {
         Player victim = (Player) event.getEntity();
         GamePlayer victimGamePlayer = GamePlayer.getGamePlayer(victim).get();
 
+        if(victimGamePlayer.getTeam().getTeamType()==TeamType.BLUE){
+            bPlayer--;
+            getGame().getBlueTeam().setRemaningPlayerCount(bPlayer);
+        }else{
+            rPlayer--;
+            getGame().getRedTeam().setRemaningPlayerCount(rPlayer);
+        }
+
         if (event.getDamager() instanceof Player){
             Player damager = (Player) event.getDamager();
             GamePlayer damagerGamePlayer = GamePlayer.getGamePlayer(damager).get();
 
-            if(damagerGamePlayer.getTeam() == victimGamePlayer.getTeam()){
+            if(damagerGamePlayer.getTeam().getTeamType() == victimGamePlayer.getTeam().getTeamType()){
                 event.setCancelled(true);
             }
         } else if (event.getDamager() instanceof Arrow) {
@@ -135,7 +214,7 @@ public class PlayingState extends GameState {
             Player damager = (Player) arrow.getShooter();
             GamePlayer damagerGamePlayer = GamePlayer.getGamePlayer(damager).get();
 
-            if(damagerGamePlayer.getTeam() == victimGamePlayer.getTeam()){
+            if(damagerGamePlayer.getTeam().getTeamType() == victimGamePlayer.getTeam().getTeamType()){
                 event.setCancelled(true);
             }
         }
@@ -179,55 +258,11 @@ public class PlayingState extends GameState {
 
     }
 
-    private static double getDistance(double source, double target){
-        return Math.abs(source-target);
-    }
-
     private void restart(GameTeam gameTeam){
         gameTeam.setScore(gameTeam.getScore()+1);
-        if(gameTeam.getScore()==3){
-            //TODO: End Game State
-        }
-
-        int maxLocX = getPlugin().getLocationManager().getLocations(Locations.centerWool).getBlockX() + 1;
-        int maxLocZ = getPlugin().getLocationManager().getLocations(Locations.centerWool).getBlockZ() + 1;
-        int minLocX = getPlugin().getLocationManager().getLocations(Locations.centerWool).getBlockX() - 1;
-        int minLocZ = getPlugin().getLocationManager().getLocations(Locations.centerWool).getBlockZ() - 1;
-        int LocY = getPlugin().getLocationManager().getLocations(Locations.centerWool).getBlockY();
-        World world = getPlugin().getLocationManager().getLocations(Locations.centerWool).getWorld();
-
-        for(int x=minLocX;x<=maxLocX;x++){
-            for(int z=minLocZ;z<=maxLocZ;z++){
-                Location location = new Location(world,x,LocY,z);
-
-                Material quartz = Material.QUARTZ_BLOCK;
-                Material concrete = Material.WHITE_CONCRETE;
-                Material bone = Material.BONE_BLOCK;
-                Material snow = Material.SNOW_BLOCK;
-                Material wool = Material.WHITE_WOOL;
-
-                int upper = 4;
-                Random random = new Random();
-                random.nextInt(1 +(upper));
-
-                switch (random.nextInt(upper)) {
-                    case 0:
-                        location.getBlock().setType(quartz);
-                        break;
-                    case 1:
-                        location.getBlock().setType(concrete);
-                        break;
-                    case 2:
-                        location.getBlock().setType(bone);
-                        break;
-                    case 3:
-                        location.getBlock().setType(snow);
-                        break;
-                    case 4:
-                        location.getBlock().setType(wool);
-                        break;
-                }
-            }
+        if(gameTeam.getScore()>=3){
+            getGame().setGameState(new EndState(getPlugin()));
+            return;
         }
 
         int bScore = getGame().getBlueTeam().getScore();
@@ -235,21 +270,24 @@ public class PlayingState extends GameState {
 
         getGame().getPlayerList().stream().map(Bukkit::getPlayer).forEach(player -> {
             GamePlayer gamePlayer = GamePlayer.getGamePlayer(player).get();
+            player.sendTitle(Colorize.format((bScore>rScore) ? "&9"+bScore+"&f - &4"+rScore : "&4"+rScore+"&f - &9"+bScore),Colorize.format((gamePlayer.getTeam().getTeamType()==gameTeam.getTeamType())?"&aROUND WON!":"&cROUND LOSE!"),5,10,5);
             if(gamePlayer.getTeam().getTeamType()== TeamType.BLUE){
                 player.teleport(getPlugin().getLocationManager().getLocations(Locations.blueSpawn));
             }else {
                 player.teleport(getPlugin().getLocationManager().getLocations(Locations.redSpawn));
             }
-
-            player.sendTitle(Colorize.format((bScore>rScore) ? "&9"+bScore+"&f - &4"+rScore : "&4"+rScore+"&f - &9"+bScore),Colorize.format((gamePlayer.getTeam()==gameTeam)?"&6ROUND WON!":"&cROUND LOSE!"));
-
         });
 
-        for(ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)){
-            armorStand.remove();
-        }
+        (new BukkitRunnable() {
+            @Override
+            public void run() {
+                onDisable();
+                getGame().setGameState(new FakePreRound(getPlugin()));
+            }
+        }).runTaskLater(getPlugin(),20);
+    }
 
-        getGame().spawnItem();
-
+    private void lowerGlass(){
+        //TODO: Lower The Glass
     }
 }

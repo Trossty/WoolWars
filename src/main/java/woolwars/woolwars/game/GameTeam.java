@@ -13,10 +13,13 @@ public class GameTeam {
     private final TeamType teamType;
     private int score;
 
+    private int remaningPlayerCount;
+
     public GameTeam(final TeamType teamType){
         playerList = new HashSet<>();
         this.teamType = teamType;
         this.score = 0;
+        this.remaningPlayerCount = 0;
     }
 
     public Set<UUID> getPlayerList() {
@@ -47,4 +50,12 @@ public class GameTeam {
         return teamType;
     }
 
+
+    public int getRemaningPlayerCount() {
+        return remaningPlayerCount;
+    }
+
+    public void setRemaningPlayerCount(int remaningPlayerCount) {
+        this.remaningPlayerCount = remaningPlayerCount;
+    }
 }

@@ -119,7 +119,6 @@ public class Game {
             Location loc = new Location(aLoc.getWorld(),aLoc.getBlockX(),aLoc.getBlockY(),aLoc.getBlockZ());
 
             int randomInt = random.nextInt(Items.values.length);
-            shout(Items.values[randomInt].getName());
             ItemArmorStand itemArmorStand = new ItemArmorStand(loc,Items.values[randomInt]);
             itemArmorStand.runTaskTimer(plugin,0,1);
             itemLList.add(itemArmorStand);
