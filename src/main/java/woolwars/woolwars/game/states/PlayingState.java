@@ -248,6 +248,9 @@ public class PlayingState extends GameState {
                 case jump: player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,100,2)); break;
                 case speed:player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,100,2)); break;
                 case strength: player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,40,1)); break;
+                case boots: player.getInventory().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS)); break;
+                case leggings: player.getInventory().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS)); break;
+                case chestplate: player.getInventory().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE)); break;
             }
 
             entity.remove();

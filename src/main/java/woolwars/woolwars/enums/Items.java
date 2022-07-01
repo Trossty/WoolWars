@@ -10,7 +10,10 @@ public enum Items {
     strength(Material.SPLASH_POTION, "Strenght Boost"),
     bow(Material.BOW,"Bow"),
     pickaxe(Material.STONE_PICKAXE, "Stone Pickaxe"),
-    sword(Material.STONE_SWORD,"Stone Sword");
+    sword(Material.STONE_SWORD,"Stone Sword"),
+    chestplate(Material.CHAINMAIL_CHESTPLATE,"Chainmail Chestplate"),
+    leggings(Material.CHAINMAIL_LEGGINGS,"Chainmail Leggings"),
+    boots(Material.CHAINMAIL_BOOTS,"Chainmail Boots");
 
     private final Material headMaterial;
     private final String name;

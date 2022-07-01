@@ -3,6 +3,7 @@ package woolwars.woolwars.game;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import woolwars.woolwars.enums.TeamType;
+import woolwars.woolwars.game.classes.AbstractClass;
 
 import java.util.*;
 
@@ -14,9 +15,12 @@ public class GamePlayer {
     private GameTeam team = new GameTeam(TeamType.NONE);
     private int killCount = 0;
 
+    private AbstractClass abstractClass;
+
     public GamePlayer(UUID uuid){
         playerUUID = uuid;
         gamePlayerMap.put(uuid,this);
+        abstractClass=null;
     }
 
     public GamePlayer(Player player){
@@ -72,4 +76,15 @@ public class GamePlayer {
         this.killCount = killCount;
     }
 
+    public void setAbstractClass(AbstractClass abstractClass) {
+        if(this.abstractClass!=null){
+            this.abstractClass.removePlayer(getPlayerUUID());
+        }
+        abstractClass.addPlayer(getPlayerUUID());
+        this.abstractClass = abstractClass;
+    }
+
+    public AbstractClass getAbstractClass() {
+        return abstractClass;
+    }
 }

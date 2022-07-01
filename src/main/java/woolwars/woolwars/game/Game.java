@@ -2,13 +2,19 @@ package woolwars.woolwars.game;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionType;
+import woolwars.woolwars.enums.ClassType;
 import woolwars.woolwars.enums.Items;
 import woolwars.woolwars.enums.Locations;
 import woolwars.woolwars.enums.TeamType;
 import woolwars.woolwars.utils.Colorize;
 import woolwars.woolwars.WoolWarsPlugin;
+import woolwars.woolwars.utils.ItemBuilder;
 
 import java.util.*;
 
@@ -128,5 +134,115 @@ public class Game {
 
     public List<ItemArmorStand> getItemLList() {
         return itemLList;
+    }
+
+    public String blueScore(){
+        String score = "";
+
+        int bScore = blue.getScore();
+
+        switch (bScore){
+            case 0:
+                score = "&l&7● ● ●";
+                break;
+            case 1:
+                score = "&l&9● &7● ●";
+                break;
+            case 2:
+                score = "&l&9● ● &7●";
+                break;
+            case 3:
+                score = "&l&9● ● ●";
+                break;
+        }
+
+        return score;
+    }
+
+    public String redScore(){
+        String score = "";
+
+        int bScore = red.getScore();
+
+        switch (bScore){
+            case 0:
+                score = "&l&7● ● ●";
+                break;
+            case 1:
+                score = "&l&c● &7● ●";
+                break;
+            case 2:
+                score = "&l&c● ● &7●";
+                break;
+            case 3:
+                score = "&l&c● ● ●";
+                break;
+        }
+
+        return score;
+    }
+
+    public void giveClass(Player player, ClassType classType){
+
+        GamePlayer gamePlayer = GamePlayer.getGamePlayer(player).get();
+
+        switch (classType){
+            case Tank:
+                player.getInventory().setItem(1,new ItemStack(Material.WOODEN_SWORD));
+                player.getInventory().setItem(2,new ItemStack(Material.WOODEN_PICKAXE));
+                break;
+            case Golem:
+                player.getInventory().setItem(1,new ItemStack(Material.STONE_SWORD));
+                break;
+            case Archer:
+                player.getInventory().setItem(1,new ItemStack(Material.BOW));
+                player.getInventory().setItem(2,new ItemStack(Material.WOODEN_PICKAXE));
+                player.getInventory().setItem(3,new ItemStack(Material.ARROW,6));
+                break;
+            case Assault:
+                player.getInventory().setItem(1,new ItemStack(Material.WOODEN_SWORD));
+                player.getInventory().setItem(2,new ItemStack(Material.IRON_PICKAXE));
+                player.getInventory().setItem(3,new ItemStack(Material.STONE_SHOVEL));
+
+                ItemStack healPot = new ItemStack(Material.POTION);
+                Potion heal = new Potion(PotionType.INSTANT_HEAL);
+                heal.setSplash(true);
+                heal.setLevel(2);
+                heal.apply(healPot);
+
+                ItemStack damagePot = new ItemStack(Material.POTION);
+                Potion damage = new Potion(PotionType.INSTANT_DAMAGE);
+                damage.setSplash(true);
+                damage.setLevel(1);
+                damage.apply(damagePot);
+
+                player.getInventory().setItem(4,healPot);
+                player.getInventory().setItem(5,damagePot);
+                break;
+            case Engineer:
+                player.getInventory().setItem(1,new ItemStack(Material.WOODEN_SWORD));
+                player.getInventory().setItem(2,new ItemStack(Material.BOW));
+                player.getInventory().setItem(3,new ItemStack(Material.ARROW,4));
+                player.getInventory().setItem(4,new ItemStack(Material.STONE_PICKAXE));
+                break;
+            case Swordsman:
+                player.getInventory().setItem(1,new ItemStack(Material.STONE_SWORD));
+                player.getInventory().setItem(2,new ItemStack(Material.WOODEN_PICKAXE));
+                ItemStack healPot1 = new ItemStack(Material.POTION);
+                Potion heal1 = new Potion(PotionType.INSTANT_HEAL);
+                heal1.setSplash(true);
+                heal1.setLevel(2);
+                heal1.apply(healPot1);
+                player.getInventory().setItem(3,healPot1);
+                break;
+        }
+
+        player.getInventory().addItem(new ItemBuilder(Material.SHEARS).setUnbreakable(true).getItemStack());
+
+        switch (gamePlayer.getTeam().getTeamType()){
+            case RED -> player.getInventory().addItem(new ItemBuilder(Material.RED_WOOL,64).getItemStack());
+            case BLUE -> player.getInventory().addItem(new ItemBuilder(Material.BLUE_WOOL,64).getItemStack());
+        }
+
     }
 }
