@@ -2,7 +2,6 @@ package woolwars.woolwars.game;
 
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
@@ -47,10 +46,6 @@ public class ItemArmorStand extends BukkitRunnable {
 
     public String getName(){
         return type.getName();
-    }
-
-    public void delArmorstand(){
-        armorStand.remove();
     }
 
 }

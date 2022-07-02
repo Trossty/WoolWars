@@ -5,6 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.A;
 import woolwars.woolwars.Objects.gui.ClassGUI;
 import woolwars.woolwars.enums.Locations;
 import woolwars.woolwars.game.states.PlayingState;
@@ -12,6 +13,7 @@ import woolwars.woolwars.game.states.PreRoundState;
 import woolwars.woolwars.utils.Colorize;
 import woolwars.woolwars.WoolWarsPlugin;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -104,7 +106,15 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                 }
             }else if(args.length==3){
                 if(args[1].equalsIgnoreCase("location")){
-                    return Arrays.asList("blueSpawn","redSpawn","lobbySpawn","deathSpawn","centerWool","items","finish");
+                    ArrayList<String> arrayList = new ArrayList();
+
+                    for(Locations locations:Locations.values()){
+                        arrayList.add(locations.name());
+                    }
+
+                    arrayList.add("finish");
+
+                    return arrayList;
                 }
             }
         }

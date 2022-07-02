@@ -141,6 +141,8 @@ public class PlayingState extends GameState {
 
         if(!getGame().isintheArea(breakingBlockLoc)){
             event.setCancelled(true);
+        }else {
+            GamePlayer.getGamePlayer(event.getPlayer()).get().setBlocksBreaked(GamePlayer.getGamePlayer(event.getPlayer()).get().getBlocksBreaked()+1);
         }
 
     }
@@ -183,6 +185,9 @@ public class PlayingState extends GameState {
                 }else if(bBlocks==9){
                     restart(getGame().getBlueTeam());
                 }
+
+                GamePlayer.getGamePlayer(event.getPlayer()).get().setBlocksPlaced(GamePlayer.getGamePlayer(event.getPlayer()).get().getBlocksPlaced()+1);
+
             }
         }
     }
@@ -235,7 +240,7 @@ public class PlayingState extends GameState {
 
         Player player = event.getPlayer();
 
-        for(Entity entity: player.getNearbyEntities(1.5,200,1.5)){
+        for(Entity entity: player.getNearbyEntities(1.5,3,1.5)){
 
             LinkedList<String> linkedList = new LinkedList<>(entity.getScoreboardTags());
             if(!linkedList.contains("type")) continue;
@@ -243,23 +248,51 @@ public class PlayingState extends GameState {
             Items type = Items.valueOf(linkedList.get(0));
 
             switch (type){
-                case bow : player.getInventory().addItem(new ItemStack(Material.BOW)); player.getInventory().addItem(new ItemStack(Material.ARROW,2)); break;
-                case sword: player.getInventory().addItem(new ItemStack(Material.STONE_SWORD)); break;
-                case pickaxe: player.getInventory().addItem(new ItemStack(Material.STONE_PICKAXE)); break;
-                case heal: if(player.getHealth()<20){player.setHealth(20);} break;
-                case jump: player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,100,2)); break;
-                case speed:player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,100,2)); break;
-                case strength: player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,40,1)); break;
-                case boots: player.getInventory().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS)); break;
-                case leggings: player.getInventory().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS)); break;
-                case chestplate: player.getInventory().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE)); break;
+                case bow :
+                    if(!player.getInventory().contains(Material.BOW)){
+                        player.getInventory().addItem(new ItemStack(Material.BOW));
+                    }
+                    player.getInventory().addItem(new ItemStack(Material.ARROW,2));
+                    break;
+                case sword:
+                    if(player.getInventory().contains(Material.WOODEN_SWORD)){
+                        replace(player,Material.WOODEN_SWORD,Material.STONE_SWORD);
+                        return;
+                    }
+                    player.getInventory().addItem(new ItemStack(Material.STONE_SWORD));
+                    break;
+                case pickaxe:
+                    if(player.getInventory().contains(Material.WOODEN_PICKAXE)){
+                        replace(player,Material.WOODEN_PICKAXE,Material.STONE_PICKAXE);
+                    }
+                    break;
+                case heal:
+                    if(player.getHealth()<20){
+                        player.setHealth(20);
+                    }
+                    break;
+                case jump:
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,100,2));
+                    break;
+                case speed:
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,100,2));
+                    break;
+                case strength:
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,40,1));
+                    break;
+                case boots:
+                    player.getInventory().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
+                    break;
+                case leggings:
+                    player.getInventory().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+                    break;
+                case chestplate:
+                    player.getInventory().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+                    break;
             }
 
             entity.remove();
         }
-
-
-
 
     }
 
@@ -294,5 +327,19 @@ public class PlayingState extends GameState {
 
     private void lowerGlass(){
         //TODO: Lower The Glass
+    }
+
+    private void replace(Player p, Material replacingItem, Material replaceToItem)
+    {
+        ItemStack[] stacks = p.getInventory().getContents();
+        for(ItemStack stack : stacks)
+        {
+            if(stack == null ) // just in case it is empty (and yes other people, it is save to check)
+                continue;
+            if(stack.getType() == replacingItem) // not sure about the material
+            {
+                stack.setType(replaceToItem);
+            }
+        }
     }
 }

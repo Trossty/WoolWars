@@ -28,6 +28,16 @@ public class Scoreboard implements AssembleAdapter {
         ArrayList<String> lines = new ArrayList<>();
         GamePlayer gamePlayer = GamePlayer.getGamePlayer(player).orElse(null);
 
+        if(getPlugin().getGameManager().getGame()==null){
+            lines.clear();
+            lines.add("");
+            lines.add("&cSet Locations!");
+            lines.add("/ww set location");
+            lines.add("");
+
+            return lines;
+        }
+
         int min = 0;
         int sec = 0;
 
@@ -38,15 +48,6 @@ public class Scoreboard implements AssembleAdapter {
             sec = getPlugin().getGameManager().getGame().getTime() % 60;
         }
 
-        if(getPlugin().getGameManager().getGame()==null){
-            lines.clear();
-            lines.add("");
-            lines.add("&cSet Locations!");
-            lines.add("/ww set location");
-            lines.add("");
-
-            return lines;
-        }
 
         if(getPlugin().getGameManager().getGame().getGameState().getName().equalsIgnoreCase("lobby")){
             lines.clear();

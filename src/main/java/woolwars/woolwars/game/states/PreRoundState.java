@@ -1,17 +1,23 @@
 package woolwars.woolwars.game.states;
 
 import org.bukkit.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import woolwars.woolwars.Objects.gui.ClassGUI;
+import woolwars.woolwars.enums.ClassType;
 import woolwars.woolwars.enums.Locations;
 import woolwars.woolwars.game.GamePlayer;
 import woolwars.woolwars.game.GameState;
+import woolwars.woolwars.game.classes.AssaultClass;
 import woolwars.woolwars.utils.Colorize;
 import woolwars.woolwars.WoolWarsPlugin;
 
@@ -37,9 +43,16 @@ public class PreRoundState extends GameState {
                 player.teleport(getPlugin().getLocationManager().getLocations(Locations.blueSpawn));
 
             }
+
+            gamePlayer.setAbstractClass(new AssaultClass(getPlugin()));
+            player.getInventory().clear();
+            getGame().giveClass(player, ClassType.Assault);
         });
 
+
         getGame().titleShout("&ePRE ROUND","&7Select Your Class!",10,10,10);
+
+        getGame().spawnNPCs();
 
         getGame().setTime(15);
 
@@ -65,8 +78,6 @@ public class PreRoundState extends GameState {
                 getGame().setTime(getGame().getTime()-1);
             }
         }).runTaskTimer(getPlugin(),0,20);
-
-
 
     }
 
@@ -111,6 +122,8 @@ public class PreRoundState extends GameState {
             }
         }
 
+        getGame().removeNPCs();
+
     }
 
     @EventHandler
@@ -147,6 +160,17 @@ public class PreRoundState extends GameState {
     @EventHandler
     public void onHunger(FoodLevelChangeEvent event){
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onInteract(PlayerInteractAtEntityEvent event){
+        Player player = event.getPlayer();
+        Entity entity = event.getRightClicked();
+
+        if(entity instanceof Villager){
+            getPlugin().getGuiapi().openGUI(player,new ClassGUI(getPlugin(),player));
+        }
+
     }
 
 }

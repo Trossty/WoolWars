@@ -3,8 +3,8 @@ package woolwars.woolwars.game;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Player;
+import org.bukkit.World;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionType;
@@ -107,16 +107,6 @@ public class Game {
         return false;
     }
 
-
-    //Items:
-    //strength
-    //speed
-    //jump boost
-    //heal
-    //pick
-    //sword
-    //bow
-
     public void spawnItem(){
         Random random = new Random();
 
@@ -184,26 +174,29 @@ public class Game {
 
     public void giveClass(Player player, ClassType classType){
 
+        player.getInventory().clear();
+
         GamePlayer gamePlayer = GamePlayer.getGamePlayer(player).get();
 
         switch (classType){
             case Tank:
-                player.getInventory().setItem(1,new ItemStack(Material.WOODEN_SWORD));
-                player.getInventory().setItem(2,new ItemStack(Material.WOODEN_PICKAXE));
+                player.getInventory().setItem(0,new ItemStack(Material.WOODEN_SWORD));
+                player.getInventory().setItem(1,new ItemStack(Material.WOODEN_PICKAXE));
                 break;
             case Golem:
-                player.getInventory().setItem(1,new ItemStack(Material.STONE_SWORD));
+                player.getInventory().setItem(0,new ItemStack(Material.STONE_SWORD));
                 break;
             case Archer:
-                player.getInventory().setItem(1,new ItemStack(Material.BOW));
-                player.getInventory().setItem(2,new ItemStack(Material.WOODEN_PICKAXE));
-                player.getInventory().setItem(3,new ItemStack(Material.ARROW,6));
+                player.getInventory().setItem(0,new ItemStack(Material.BOW));
+                player.getInventory().setItem(1,new ItemStack(Material.WOODEN_PICKAXE));
+                player.getInventory().setItem(2,new ItemStack(Material.ARROW,6));
                 break;
             case Assault:
-                player.getInventory().setItem(1,new ItemStack(Material.WOODEN_SWORD));
-                player.getInventory().setItem(2,new ItemStack(Material.IRON_PICKAXE));
-                player.getInventory().setItem(3,new ItemStack(Material.STONE_SHOVEL));
+                player.getInventory().setItem(0,new ItemStack(Material.WOODEN_SWORD));
+                player.getInventory().setItem(1,new ItemStack(Material.IRON_PICKAXE));
+                player.getInventory().setItem(2,new ItemStack(Material.STONE_SHOVEL));
 
+                /*
                 ItemStack healPot = new ItemStack(Material.POTION);
                 Potion heal = new Potion(PotionType.INSTANT_HEAL);
                 heal.setSplash(true);
@@ -216,25 +209,32 @@ public class Game {
                 damage.setLevel(1);
                 damage.apply(damagePot);
 
-                player.getInventory().setItem(4,healPot);
-                player.getInventory().setItem(5,damagePot);
+                player.getInventory().setItem(3,healPot);
+                player.getInventory().setItem(4,damagePot);
+
+                 */
                 break;
             case Engineer:
-                player.getInventory().setItem(1,new ItemStack(Material.WOODEN_SWORD));
-                player.getInventory().setItem(2,new ItemStack(Material.BOW));
-                player.getInventory().setItem(3,new ItemStack(Material.ARROW,4));
-                player.getInventory().setItem(4,new ItemStack(Material.STONE_PICKAXE));
+                player.getInventory().setItem(0,new ItemStack(Material.WOODEN_SWORD));
+                player.getInventory().setItem(1,new ItemStack(Material.BOW));
+                player.getInventory().setItem(2,new ItemStack(Material.ARROW,4));
+                player.getInventory().setItem(3,new ItemStack(Material.STONE_PICKAXE));
                 break;
             case Swordsman:
                 player.getInventory().setItem(1,new ItemStack(Material.STONE_SWORD));
                 player.getInventory().setItem(2,new ItemStack(Material.WOODEN_PICKAXE));
+                /*
                 ItemStack healPot1 = new ItemStack(Material.POTION);
                 Potion heal1 = new Potion(PotionType.INSTANT_HEAL);
                 heal1.setSplash(true);
                 heal1.setLevel(2);
                 heal1.apply(healPot1);
                 player.getInventory().setItem(3,healPot1);
+
+                 */
                 break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + classType);
         }
 
         player.getInventory().addItem(new ItemBuilder(Material.SHEARS).setUnbreakable(true).getItemStack());
@@ -252,5 +252,28 @@ public class Game {
 
     public void setRound(int round) {
         this.round = round;
+    }
+
+    public void spawnNPCs(){
+        Location rNPC = plugin.getLocationManager().getLocations(Locations.rNpc);
+        Location bNPC = plugin.getLocationManager().getLocations(Locations.bNpc);
+        World world = rNPC.getWorld();
+
+        Villager rVillager = (Villager) world.spawnEntity(rNPC, EntityType.VILLAGER);
+        Villager bVillager = (Villager) world.spawnEntity(bNPC, EntityType.VILLAGER);
+
+        rVillager.setCustomName(Colorize.format("&6SELECT YOUR CLASS"));
+        bVillager.setCustomName(Colorize.format("&6SELECT YOUR CLASS"));
+
+        rVillager.setAI(false);
+        bVillager.setAI(false);
+    }
+
+    public void removeNPCs(){
+        Location bNPC = plugin.getLocationManager().getLocations(Locations.bNpc);
+        World world = bNPC.getWorld();
+        for(Villager villager: world.getEntitiesByClass(Villager.class)){
+            villager.remove();
+        }
     }
 }

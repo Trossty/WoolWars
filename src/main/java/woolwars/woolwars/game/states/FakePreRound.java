@@ -2,15 +2,20 @@ package woolwars.woolwars.game.states;
 
 import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import woolwars.woolwars.Objects.gui.ClassGUI;
 import woolwars.woolwars.WoolWarsPlugin;
+import woolwars.woolwars.enums.ClassType;
 import woolwars.woolwars.enums.Locations;
 import woolwars.woolwars.game.GamePlayer;
 import woolwars.woolwars.game.GameState;
@@ -27,6 +32,12 @@ public class FakePreRound extends GameState {
     @Override
     public void onEnable(){
         super.onEnable();
+
+        getGame().getPlayerList().stream().map(Bukkit::getPlayer).forEach(player -> {
+            GamePlayer gamePlayer = GamePlayer.getGamePlayer(player).get();
+            player.getInventory().clear();
+            getGame().giveClass(player, gamePlayer.getAbstractClass().getClassType());
+        });
 
         getGame().titleShout("&ePRE ROUND","&7Select Your Class!",10,10,10);
 
@@ -76,6 +87,8 @@ public class FakePreRound extends GameState {
             armorStand.remove();
         }
 
+        getGame().spawnNPCs();
+
         getGame().setTime(12);
 
         (new BukkitRunnable() {
@@ -100,6 +113,7 @@ public class FakePreRound extends GameState {
     @Override
     public void onDisable(){
         super.onDisable();
+        getGame().removeNPCs();
     }
 
     @EventHandler
@@ -138,5 +152,15 @@ public class FakePreRound extends GameState {
         event.setCancelled(true);
     }
 
+    @EventHandler
+    public void onInteract(PlayerInteractAtEntityEvent event){
+        Player player = event.getPlayer();
+        Entity entity = event.getRightClicked();
+
+        if(entity instanceof Villager){
+            getPlugin().getGuiapi().openGUI(player,new ClassGUI(getPlugin(),player));
+        }
+
+    }
 
 }

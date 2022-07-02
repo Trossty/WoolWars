@@ -32,6 +32,12 @@ public class LocationManager {
             case centerWool:
                 plugin.getLocations().getConfiguration().set("centerWool",location);
                 break;
+            case bNpc:
+                plugin.getLocations().getConfiguration().set("bNPC",location);
+                break;
+            case rNpc:
+                plugin.getLocations().getConfiguration().set("rNPC",location);
+                break;
         }
     }
 
@@ -45,6 +51,10 @@ public class LocationManager {
                 return plugin.getLocations().getConfiguration().getLocation("lobbySpawn");
             case centerWool:
                 return plugin.getLocations().getConfiguration().getLocation("centerWool");
+            case rNpc:
+                return plugin.getLocations().getConfiguration().getLocation("rNPC");
+            case bNpc:
+                return plugin.getLocations().getConfiguration().getLocation("bNPC");
         }
         return null;
     }

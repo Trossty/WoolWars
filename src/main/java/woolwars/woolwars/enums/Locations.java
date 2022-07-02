@@ -6,6 +6,8 @@ public enum Locations {
     redSpawn,
     lobbySpawn,
     centerWool,
-    items
+    items,
+    bNpc,
+    rNpc
 
 }

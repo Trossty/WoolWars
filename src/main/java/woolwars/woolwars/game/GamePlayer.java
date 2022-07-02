@@ -14,13 +14,18 @@ public class GamePlayer {
     private final UUID playerUUID;
     private GameTeam team = new GameTeam(TeamType.NONE);
     private int killCount = 0;
-
+    private int blocksPlaced = 0;
+    private int blocksBreaked = 0;
     private AbstractClass abstractClass;
+
+    private boolean isItUsed;
+
 
     public GamePlayer(UUID uuid){
         playerUUID = uuid;
         gamePlayerMap.put(uuid,this);
         abstractClass=null;
+        isItUsed = false;
     }
 
     public GamePlayer(Player player){
@@ -86,5 +91,29 @@ public class GamePlayer {
 
     public AbstractClass getAbstractClass() {
         return abstractClass;
+    }
+
+    public void setIsItUsed(boolean isItUsed) {
+        isItUsed = isItUsed;
+    }
+
+    public boolean getIsItUsed(){
+        return isItUsed;
+    }
+
+    public void setBlocksBreaked(int blocksBreaked) {
+        this.blocksBreaked = blocksBreaked;
+    }
+
+    public void setBlocksPlaced(int blocksPlaced) {
+        this.blocksPlaced = blocksPlaced;
+    }
+
+    public int getBlocksBreaked() {
+        return blocksBreaked;
+    }
+
+    public int getBlocksPlaced() {
+        return blocksPlaced;
     }
 }
