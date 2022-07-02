@@ -51,50 +51,45 @@ public class Scoreboard implements AssembleAdapter {
         if(getPlugin().getGameManager().getGame().getGameState().getName().equalsIgnoreCase("lobby")){
             lines.clear();
             lines.add("");
-            lines.add(Colorize.format("&6Players:"));
-            lines.add(Colorize.format(" &7"+ allPlayers+"/8"));
+            lines.add(Colorize.format("&6Players: &7"+ allPlayers+"/8"));
+            lines.add(Colorize.format("&6State:&7 Lobby"));
             lines.add("");
-            lines.add(Colorize.format("&6Time:"));
-            lines.add(Colorize.format(" &7"+min+":"+sec));
+            lines.add(Colorize.format(time()));
             lines.add("");
             return lines;
         }else if(getPlugin().getGameManager().getGame().getGameState().getName().equalsIgnoreCase("preround")){
             lines.clear();
             lines.add("");
-            lines.add(Colorize.format("&6Players:"));
-            lines.add(Colorize.format(" &7"+ allPlayers+"/8"));
+            lines.add(Colorize.format("&6State:&7 Pre round"));
+            lines.add(Colorize.format("&6Round:&7 "+getPlugin().getGameManager().getGame().getRound()));
             lines.add("");
-            lines.add(Colorize.format("&6Score:"));
             lines.add(Colorize.format("&c[R] "+getPlugin().getGameManager().getGame().redScore()));
             lines.add(Colorize.format("&9[B] "+getPlugin().getGameManager().getGame().blueScore()));
             lines.add("");
-            lines.add(Colorize.format("&6Team:"));
-            lines.add(Colorize.format(gamePlayer.getTeam().getTeamType().getColoredName()));
+            lines.add(Colorize.format("&6Team: "+gamePlayer.getTeam().getTeamType().getColoredName()));
             lines.add("");
-            lines.add(Colorize.format("&6Time:"));
-            lines.add(Colorize.format(" &7"+min+":"+sec));
+            lines.add(Colorize.format("&6Time: &7"+min+":"+sec));
             return lines;
         }else if(getPlugin().getGameManager().getGame().getGameState().getName().equalsIgnoreCase("playing")){
             lines.clear();
             lines.add("");
-            lines.add(Colorize.format("&6Players:"));
-            lines.add(Colorize.format(" &7"+ allPlayers+"/8"));
+            lines.add(Colorize.format("&6State:&7 Playing"));
+            lines.add(Colorize.format("&6Round:&7 "+getPlugin().getGameManager().getGame().getRound()));
             lines.add("");
             lines.add(Colorize.format("&6Score:"));
             lines.add(Colorize.format("&c[R] "+getPlugin().getGameManager().getGame().redScore()));
             lines.add(Colorize.format("&9[B] "+getPlugin().getGameManager().getGame().blueScore()));
             lines.add("");
-            lines.add(Colorize.format("&c[R] Remaning Player: "+ getPlugin().getGameManager().getGame().getRedTeam().getRemaningPlayerCount()));
-            lines.add(Colorize.format("&9[B] Remaning Player: "+ getPlugin().getGameManager().getGame().getBlueTeam().getRemaningPlayerCount()));
+            lines.add(Colorize.format("&cRed Player: "+ getPlugin().getGameManager().getGame().getRedTeam().getRemaningPlayerCount()));
+            lines.add(Colorize.format("&9Blue Player: "+ getPlugin().getGameManager().getGame().getBlueTeam().getRemaningPlayerCount()));
             lines.add("");
-            lines.add(Colorize.format("&6Time:"));
-            lines.add(Colorize.format(" &7"+min+":"+sec));
+            lines.add(Colorize.format("&6Time: &7"+min+":"+sec));
             return lines;
         }else if(getPlugin().getGameManager().getGame().getGameState().getName().equalsIgnoreCase("end")){
             lines.clear();
             lines.add("");
-            lines.add(Colorize.format("&6Players:"));
-            lines.add(Colorize.format(" &7"+ allPlayers+"/8"));
+            lines.add(Colorize.format("&6State:&7 Game Over!"));
+            lines.add(Colorize.format("&6Round:&7 "+getPlugin().getGameManager().getGame().getRound()));
             lines.add("");
             lines.add(Colorize.format("&6Score:"));
             lines.add(Colorize.format("&c[R] "+getPlugin().getGameManager().getGame().redScore()));
@@ -103,8 +98,7 @@ public class Scoreboard implements AssembleAdapter {
             lines.add(Colorize.format("&6WINNER:"));
             lines.add(Colorize.format((getPlugin().getGameManager().getGame().getBlueTeam().getScore() == 3)?"&9BLUE":"&4RED"));
             lines.add("");
-            lines.add(Colorize.format("&6Time:"));
-            lines.add(Colorize.format(" &7"+min+":"+sec));
+            lines.add(Colorize.format("&6Time: &7"+min+":"+sec));
             return lines;
         }
 
@@ -115,4 +109,22 @@ public class Scoreboard implements AssembleAdapter {
         return plugin;
     }
 
+    public String time() {
+
+        int min = 0;
+        int sec = 0;
+
+        if(getPlugin().getGameManager().getGame().getTime() > 0){
+            min = getPlugin().getGameManager().getGame().getTime() / 60;
+            sec = getPlugin().getGameManager().getGame().getTime() % 60;
+        }else{
+            return "&fWaiting...";
+        }
+
+        if(getPlugin().getGameManager().getGame().getPlayerList().size()<8){
+            return "&fWaiting...";
+        }
+
+        return ("&6Time: &7"+min+":"+sec);
+    }
 }

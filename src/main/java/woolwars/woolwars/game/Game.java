@@ -32,7 +32,7 @@ public class Game {
 
     private int time = 0;
 
-    private ArmorStand armorStand;
+    private int round = 0;
     public Game(WoolWarsPlugin plugin){
 
         this.plugin = plugin;
@@ -244,5 +244,13 @@ public class Game {
             case BLUE -> player.getInventory().addItem(new ItemBuilder(Material.BLUE_WOOL,64).getItemStack());
         }
 
+    }
+
+    public int getRound() {
+        return round;
+    }
+
+    public void setRound(int round) {
+        this.round = round;
     }
 }

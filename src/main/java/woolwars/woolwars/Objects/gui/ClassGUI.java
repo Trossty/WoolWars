@@ -56,6 +56,7 @@ public class ClassGUI extends GUI<WoolWarsPlugin> {
                     return ButtonAction.CANCEL;
                 }
                 gamePlayer.setAbstractClass(kit);
+                getPlugin().getGameManager().getGame().giveClass(player,kit.getClassType());
                 whoClicked.playSound(whoClicked.getLocation(),Sound.ENTITY_PLAYER_LEVELUP,.5f,.5f);
                 return ButtonAction.CLOSE_GUI;
 

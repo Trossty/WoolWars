@@ -50,6 +50,8 @@ public class PlayingState extends GameState {
     public void onEnable(){
         super.onEnable();
 
+        getGame().setRound(getGame().getRound()+1);
+
         itemsLocations.clear();
         itemsLocationswith.clear();
 
