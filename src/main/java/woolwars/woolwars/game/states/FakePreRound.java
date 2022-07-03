@@ -37,6 +37,7 @@ public class FakePreRound extends GameState {
             GamePlayer gamePlayer = GamePlayer.getGamePlayer(player).get();
             player.getInventory().clear();
             getGame().giveClass(player, gamePlayer.getAbstractClass().getClassType());
+            backToNormal(player);
         });
 
         getGame().titleShout("&ePRE ROUND","&7Select Your Class!",10,10,10);
@@ -161,6 +162,15 @@ public class FakePreRound extends GameState {
             getPlugin().getGuiapi().openGUI(player,new ClassGUI(getPlugin(),player));
         }
 
+    }
+
+    private void backToNormal(Player player){
+        player.getInventory().clear();
+        player.setGameMode(GameMode.SURVIVAL);
+        player.setAllowFlight(false);
+        player.setFlying(false);
+
+        getGame().getPlayerList().stream().map(Bukkit::getPlayer).forEach(players -> players.showPlayer(player));
     }
 
 }

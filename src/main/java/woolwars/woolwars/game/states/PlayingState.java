@@ -1,9 +1,6 @@
 package woolwars.woolwars.game.states;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -12,6 +9,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -21,10 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import woolwars.woolwars.enums.Items;
 import woolwars.woolwars.enums.Locations;
 import woolwars.woolwars.enums.TeamType;
-import woolwars.woolwars.game.GamePlayer;
-import woolwars.woolwars.game.GameState;
-import woolwars.woolwars.game.GameTeam;
-import woolwars.woolwars.game.ItemArmorStand;
+import woolwars.woolwars.game.*;
 import woolwars.woolwars.utils.Colorize;
 import woolwars.woolwars.WoolWarsPlugin;
 
@@ -200,20 +195,17 @@ public class PlayingState extends GameState {
         Player victim = (Player) event.getEntity();
         GamePlayer victimGamePlayer = GamePlayer.getGamePlayer(victim).get();
 
-        if(victimGamePlayer.getTeam().getTeamType()==TeamType.BLUE){
-            bPlayer--;
-            getGame().getBlueTeam().setRemaningPlayerCount(bPlayer);
-        }else{
-            rPlayer--;
-            getGame().getRedTeam().setRemaningPlayerCount(rPlayer);
-        }
-
         if (event.getDamager() instanceof Player){
             Player damager = (Player) event.getDamager();
             GamePlayer damagerGamePlayer = GamePlayer.getGamePlayer(damager).get();
 
+            if(damager.getGameMode()==GameMode.ADVENTURE){
+                event.setCancelled(true);
+            }
+
             if(damagerGamePlayer.getTeam().getTeamType() == victimGamePlayer.getTeam().getTeamType()){
                 event.setCancelled(true);
+                return;
             }
         } else if (event.getDamager() instanceof Arrow) {
             Arrow arrow = (Arrow) event.getDamager();
@@ -223,8 +215,37 @@ public class PlayingState extends GameState {
 
             if(damagerGamePlayer.getTeam().getTeamType() == victimGamePlayer.getTeam().getTeamType()){
                 event.setCancelled(true);
+                return;
             }
         }
+
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event){
+
+        event.getDrops().clear();
+
+        Player victim = event.getEntity();
+        Player killer = event.getEntity().getKiller();
+
+        GamePlayer victimGamePlayer = GamePlayer.getGamePlayer(victim).get();
+        GamePlayer killerGamePlayer = GamePlayer.getGamePlayer(killer).get();
+
+        gogoSpec(victim);
+
+        victim.teleport(killer.getLocation());
+
+        killerGamePlayer.setKillCount(killerGamePlayer.getKillCount()+1);
+
+        if(victimGamePlayer.getTeam().getTeamType()==TeamType.BLUE){
+            bPlayer--;
+            getGame().getBlueTeam().setRemaningPlayerCount(bPlayer);
+        }else{
+            rPlayer--;
+            getGame().getRedTeam().setRemaningPlayerCount(rPlayer);
+        }
+
     }
 
     @EventHandler
@@ -342,4 +363,15 @@ public class PlayingState extends GameState {
             }
         }
     }
+
+    private void gogoSpec(Player player){
+
+        player.getInventory().clear();
+        player.setGameMode(GameMode.ADVENTURE);
+        player.setAllowFlight(true);
+        player.setFlying(true);
+
+        getGame().getPlayerList().stream().map(Bukkit::getPlayer).forEach(players -> players.hidePlayer(player));
+    }
+
 }
