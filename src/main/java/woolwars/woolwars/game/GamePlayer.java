@@ -93,8 +93,8 @@ public class GamePlayer {
         return abstractClass;
     }
 
-    public void setIsItUsed(boolean isItUsed) {
-        isItUsed = isItUsed;
+    public void setItUsed(boolean itUsed) {
+        isItUsed = itUsed;
     }
 
     public boolean getIsItUsed(){

@@ -9,8 +9,10 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import woolwars.woolwars.Objects.gui.ClassGUI;
 import woolwars.woolwars.enums.ClassType;
@@ -32,6 +34,8 @@ public class PreRoundState extends GameState {
     public void onEnable(){
         super.onEnable();
 
+        getGame().setCanBreakPlace(true);
+
         getGame().getPlayerList().stream().map(Bukkit::getPlayer).forEach(player -> {
             GamePlayer gamePlayer = GamePlayer.getGamePlayer(player).get();
 
@@ -46,7 +50,8 @@ public class PreRoundState extends GameState {
 
             gamePlayer.setAbstractClass(new AssaultClass(getPlugin()));
             player.getInventory().clear();
-            getGame().giveClass(player, ClassType.Assault);
+            getGame().giveClass(player, gamePlayer.getAbstractClass().getClassType());
+            gamePlayer.setItUsed(false);
         });
 
 
@@ -98,7 +103,7 @@ public class PreRoundState extends GameState {
 
                 Material quartz = Material.QUARTZ_BLOCK;
                 Material concrete = Material.WHITE_CONCRETE;
-                Material bone = Material.BONE_BLOCK;
+                Material wool = Material.WHITE_WOOL;
                 Material snow = Material.SNOW_BLOCK;
 
                 int upper = 3;
@@ -113,7 +118,7 @@ public class PreRoundState extends GameState {
                         location.getBlock().setType(concrete);
                         break;
                     case 2:
-                        location.getBlock().setType(bone);
+                        location.getBlock().setType(wool);
                         break;
                     case 3:
                         location.getBlock().setType(snow);
@@ -123,6 +128,17 @@ public class PreRoundState extends GameState {
         }
 
         getGame().removeNPCs();
+
+    }
+
+    @EventHandler
+    public void onClicking(InventoryClickEvent event){
+        Player player = (Player) event.getWhoClicked();
+        Inventory inventory = event.getInventory();
+
+        if(player.getInventory()==inventory){
+            event.setCancelled(true);
+        }
 
     }
 

@@ -33,6 +33,9 @@ public class Game {
     private int time = 0;
 
     private int round = 0;
+
+    private boolean canBreakPlace;
+
     public Game(WoolWarsPlugin plugin){
 
         this.plugin = plugin;
@@ -43,6 +46,8 @@ public class Game {
         playerList = new ArrayList();
 
         itemLList = new LinkedList<>();
+
+        canBreakPlace = true;
     }
 
     public GameState getGameState() {
@@ -182,14 +187,17 @@ public class Game {
             case Tank:
                 player.getInventory().setItem(0,new ItemStack(Material.WOODEN_SWORD));
                 player.getInventory().setItem(1,new ItemStack(Material.WOODEN_PICKAXE));
+                player.getInventory().setItem(8,new ItemBuilder(Material.BLAZE_POWDER).withDisplayName("&6GIGAHEALTH").getItemStack());
                 break;
             case Golem:
                 player.getInventory().setItem(0,new ItemStack(Material.STONE_SWORD));
+                player.getInventory().setItem(8,new ItemBuilder(Material.BLAZE_POWDER).withDisplayName("&6GOLDEN SHELL").getItemStack());
                 break;
             case Archer:
                 player.getInventory().setItem(0,new ItemStack(Material.BOW));
                 player.getInventory().setItem(1,new ItemStack(Material.WOODEN_PICKAXE));
                 player.getInventory().setItem(2,new ItemStack(Material.ARROW,6));
+                player.getInventory().setItem(8,new ItemBuilder(Material.BLAZE_POWDER).withDisplayName("&6STEP BACK").getItemStack());
                 break;
             case Assault:
                 player.getInventory().setItem(0,new ItemStack(Material.WOODEN_SWORD));
@@ -213,12 +221,14 @@ public class Game {
                 player.getInventory().setItem(4,damagePot);
 
                  */
+                player.getInventory().setItem(8,new ItemBuilder(Material.BLAZE_POWDER).withDisplayName("&6KNOCKBACK TNT").getItemStack());
                 break;
             case Engineer:
                 player.getInventory().setItem(0,new ItemStack(Material.WOODEN_SWORD));
                 player.getInventory().setItem(1,new ItemStack(Material.BOW));
                 player.getInventory().setItem(2,new ItemStack(Material.ARROW,4));
                 player.getInventory().setItem(3,new ItemStack(Material.STONE_PICKAXE));
+                player.getInventory().setItem(8,new ItemBuilder(Material.BLAZE_POWDER).withDisplayName("&6HACK").getItemStack());
                 break;
             case Swordsman:
                 player.getInventory().setItem(1,new ItemStack(Material.STONE_SWORD));
@@ -232,6 +242,7 @@ public class Game {
                 player.getInventory().setItem(3,healPot1);
 
                  */
+                player.getInventory().setItem(8,new ItemBuilder(Material.BLAZE_POWDER).withDisplayName("&6SPRINT").getItemStack());
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + classType);
@@ -275,5 +286,13 @@ public class Game {
         for(Villager villager: world.getEntitiesByClass(Villager.class)){
             villager.remove();
         }
+    }
+
+    public boolean isCanBreakPlace() {
+        return canBreakPlace;
+    }
+
+    public void setCanBreakPlace(boolean canBreakPlace) {
+        this.canBreakPlace = canBreakPlace;
     }
 }

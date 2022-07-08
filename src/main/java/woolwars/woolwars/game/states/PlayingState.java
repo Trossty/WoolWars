@@ -1,17 +1,23 @@
 package woolwars.woolwars.game.states;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -22,6 +28,7 @@ import woolwars.woolwars.enums.TeamType;
 import woolwars.woolwars.game.*;
 import woolwars.woolwars.utils.Colorize;
 import woolwars.woolwars.WoolWarsPlugin;
+import woolwars.woolwars.utils.ItemBuilder;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -93,6 +100,7 @@ public class PlayingState extends GameState {
                         }
                         getGame().getBlueTeam().setScore(getGame().getBlueTeam().getScore()+1);
                         restart(getGame().getBlueTeam());
+                        cancel();
                     }else if(bPlayer==0){
                         if(getGame().getRedTeam().getScore()==3){
                             getGame().setGameState(new EndState(getPlugin()));
@@ -100,9 +108,10 @@ public class PlayingState extends GameState {
                         }
                         getGame().getRedTeam().setScore(getGame().getRedTeam().getScore()+1);
                         restart(getGame().getRedTeam());
+                        cancel();
+                    }else{
+                        getGame().setTime(30);
                     }
-
-                    cancel();
                 }
 
                 getGame().setTime(getGame().getTime()-1);
@@ -131,7 +140,124 @@ public class PlayingState extends GameState {
     }
 
     @EventHandler
+    public void onInteract(PlayerInteractEvent event){
+        Player player = event.getPlayer();
+        GamePlayer gamePlayer = GamePlayer.getGamePlayer(player).get();
+        if(player.getInventory().getItemInMainHand().getType()==Material.BLAZE_POWDER){
+            if(event.getAction()==Action.RIGHT_CLICK_AIR || event.getAction()==Action.RIGHT_CLICK_BLOCK){
+                if(!gamePlayer.getIsItUsed()){
+                    gamePlayer.setItUsed(true);
+                    switch (gamePlayer.getAbstractClass().getClassType()){
+                        case Swordsman:
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,20,4));
+                            break;
+                        case Engineer:
+
+                            final int[] i = {6};
+
+                            getGame().setCanBreakPlace(false);
+                            (new BukkitRunnable(){
+
+                                @Override
+                                public void run() {
+
+                                    getGame().getPlayerList().stream().map(Bukkit::getPlayer).forEach(all -> all.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Colorize.format("&6The Center Unlocks In "+i[0]))));
+
+                                    if(i[0]==0){
+                                        getGame().setCanBreakPlace(true);
+                                        cancel();
+                                    }
+
+                                    i[0]--;
+                                }
+                            }).runTaskTimer(getPlugin(),0,20);
+
+                            break;
+                        case Assault:
+                            player.getLocation().getWorld().spawnEntity(player.getLocation(), EntityType.PRIMED_TNT);
+                            break;
+                        case Archer:
+                            player.setVelocity(player.getLocation().getDirection().multiply(-1).setY(1));
+                            break;
+                        case Golem:
+
+                            Material head;
+                            Material chest;
+                            Material leggings;
+                            Material boots;
+
+                            if(player.getInventory().getHelmet()==null){
+                                head = Material.AIR;
+                            }else {
+                                head = player.getInventory().getHelmet().getType();
+                            }
+
+                            if(player.getInventory().getChestplate()==null){
+                                chest = Material.AIR;
+                            }else {
+                                chest = player.getInventory().getChestplate().getType();
+                            }
+
+                            if(player.getInventory().getLeggings()==null){
+                                leggings = Material.AIR;
+                            }else {
+                                leggings = player.getInventory().getLeggings().getType();
+                            }
+
+                            if(player.getInventory().getBoots()==null){
+                                boots = Material.AIR;
+                            }else {
+                                boots = player.getInventory().getBoots().getType();
+                            }
+
+                            player.getInventory().setHelmet(new ItemStack(Material.AIR));
+                            player.getInventory().setChestplate(new ItemBuilder(Material.GOLDEN_CHESTPLATE).withEnchant(Enchantment.PROTECTION_ENVIRONMENTAL,4,true).getItemStack());
+                            player.getInventory().setLeggings(new ItemBuilder(Material.GOLDEN_LEGGINGS).withEnchant(Enchantment.PROTECTION_ENVIRONMENTAL,4,true).getItemStack());
+                            player.getInventory().setBoots(new ItemBuilder(Material.GOLDEN_BOOTS).withEnchant(Enchantment.PROTECTION_ENVIRONMENTAL,4,true).getItemStack());
+
+                            (new BukkitRunnable(){
+                                @Override
+                                public void run() {
+                                    player.getInventory().setHelmet(new ItemStack(head));
+                                    player.getInventory().setChestplate(new ItemStack(chest));
+                                    player.getInventory().setLeggings(new ItemStack(leggings));
+                                    player.getInventory().setBoots(new ItemStack(boots));
+                                }
+                            }).runTaskLater(getPlugin(),100);
+
+                            break;
+                        case Tank:
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,50,4));
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.HEAL,5,100));
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onTNTExplode(EntityExplodeEvent event){
+        event.setCancelled(true);
+        Entity entity = event.getEntity();
+
+        if(!(entity instanceof TNTPrimed)) return;
+
+        Location location = event.getLocation();
+
+        location.getWorld().getNearbyEntities(location,3,3,3).forEach(allentity -> {
+            allentity.setVelocity(entity.getLocation().getDirection().multiply(-4).setY(0.5));
+        });
+
+    }
+
+    @EventHandler
     public void onBreakingBlocks(BlockBreakEvent event){
+
+        if(!getGame().isCanBreakPlace()){
+            event.setCancelled(true);
+        }
+
         Location breakingBlockLoc = event.getBlock().getLocation();
 
         if(!getGame().isintheArea(breakingBlockLoc)){
@@ -140,10 +266,17 @@ public class PlayingState extends GameState {
             GamePlayer.getGamePlayer(event.getPlayer()).get().setBlocksBreaked(GamePlayer.getGamePlayer(event.getPlayer()).get().getBlocksBreaked()+1);
         }
 
+        event.getBlock().getDrops().clear();
+
     }
 
     @EventHandler
     public void onPlacingBlocks(BlockPlaceEvent event){
+
+        if(!getGame().isCanBreakPlace()){
+            event.setCancelled(true);
+        }
+
         Location placingBlockLoc = event.getBlock().getLocation();
 
         if(!getGame().isintheArea(placingBlockLoc)){
@@ -189,6 +322,7 @@ public class PlayingState extends GameState {
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event){
+        if(event.getDamager() instanceof TNTPrimed) event.setCancelled(true);
         if(!(event.getEntity() instanceof Player)) return;
         if(!(event.getDamager() instanceof Player) || !(event.getDamager() instanceof Arrow)) return;
 
@@ -227,6 +361,7 @@ public class PlayingState extends GameState {
         event.getDrops().clear();
 
         Player victim = event.getEntity();
+        if(!(event.getEntity().getKiller() instanceof Player)) return;
         Player killer = event.getEntity().getKiller();
 
         GamePlayer victimGamePlayer = GamePlayer.getGamePlayer(victim).get();
@@ -279,12 +414,15 @@ public class PlayingState extends GameState {
                     if(player.getInventory().contains(Material.WOODEN_SWORD)){
                         replace(player,Material.WOODEN_SWORD,Material.STONE_SWORD);
                         return;
+                    }else if(!player.getInventory().contains(Material.STONE_SWORD)){
+                        player.getInventory().addItem(new ItemStack(Material.STONE_SWORD));
                     }
-                    player.getInventory().addItem(new ItemStack(Material.STONE_SWORD));
                     break;
                 case pickaxe:
                     if(player.getInventory().contains(Material.WOODEN_PICKAXE)){
                         replace(player,Material.WOODEN_PICKAXE,Material.STONE_PICKAXE);
+                    }else if(!player.getInventory().contains(Material.STONE_PICKAXE)){
+                        player.getInventory().addItem(new ItemStack(Material.STONE_PICKAXE));
                     }
                     break;
                 case heal:
@@ -313,6 +451,17 @@ public class PlayingState extends GameState {
             }
 
             entity.remove();
+        }
+
+    }
+
+    @EventHandler
+    public void onClicking(InventoryClickEvent event){
+        Player player = (Player) event.getWhoClicked();
+        Inventory inventory = event.getInventory();
+
+        if(player.getInventory()==inventory){
+            event.setCancelled(true);
         }
 
     }
@@ -355,9 +504,9 @@ public class PlayingState extends GameState {
         ItemStack[] stacks = p.getInventory().getContents();
         for(ItemStack stack : stacks)
         {
-            if(stack == null ) // just in case it is empty (and yes other people, it is save to check)
+            if(stack == null )
                 continue;
-            if(stack.getType() == replacingItem) // not sure about the material
+            if(stack.getType() == replacingItem)
             {
                 stack.setType(replaceToItem);
             }
