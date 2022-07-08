@@ -2,4 +2,4 @@
 WoolWars Minigame!
 
 ## TODO:
-  - customizations [ ]
+  - [x] customizations 
