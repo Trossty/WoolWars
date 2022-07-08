@@ -1,4 +1,4 @@
-# WoolWars
+# WoolWars:red_circle::large_blue_circle:
 WoolWars Minigame!
 
 Plugin Version : 0.1
